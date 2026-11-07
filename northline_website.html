@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Northline Cycles</title>
+<style>
+  /* ------------------------------------------------------------------
+     Paste ONE of these into CHAT_URL below:
+     - Public chat (anyone can use it): your Hugging Face Space URL,
+       for example "https://your-name-northline-assistant.hf.space"
+     - Internal chat (visitors signed in to Databricks): the src="..." of the
+       iframe from Genie Agents -> Northline Customer Care -> Share -> Embed agent
+     ------------------------------------------------------------------ */
+</style>
+<script>
+  const CHAT_URL = "";   // <-- paste the chat URL here
+</script>
+<style>
+  :root {
+    --ink: #17212b; --muted: #5b6b78; --bg: #f6f4ef; --card: #ffffff;
+    --accent: #1f6f5c; --accent-ink: #ffffff; --line: #e3ded4;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+         color: var(--ink); background: var(--bg); }
+  header { display: flex; align-items: center; justify-content: space-between; padding: 18px 32px;
+           background: var(--card); border-bottom: 1px solid var(--line); }
+  .logo { font-weight: 800; letter-spacing: .5px; font-size: 20px; }
+  .logo span { color: var(--accent); }
+  nav a { margin-left: 22px; color: var(--muted); text-decoration: none; font-size: 15px; }
+  .hero { padding: 72px 32px 48px; max-width: 1100px; margin: 0 auto; }
+  .hero h1 { font-size: 44px; line-height: 1.1; margin: 0 0 14px; max-width: 640px; }
+  .hero p { font-size: 18px; color: var(--muted); max-width: 560px; margin: 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;
+          max-width: 1100px; margin: 0 auto; padding: 0 32px 96px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; }
+  .card .tag { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--accent); font-weight: 700; }
+  .card h3 { margin: 8px 0 6px; font-size: 18px; }
+  .card .price { color: var(--muted); }
+  .help { max-width: 1100px; margin: 0 auto 120px; padding: 0 32px; color: var(--muted); }
+
+  /* Chat launcher and panel */
+  .launcher { position: fixed; right: 24px; bottom: 24px; background: var(--accent); color: var(--accent-ink);
+              border: 0; border-radius: 999px; padding: 14px 20px; font-size: 15px; font-weight: 600;
+              box-shadow: 0 6px 20px rgba(0,0,0,.18); cursor: pointer; }
+  .panel { position: fixed; right: 24px; bottom: 88px; width: min(440px, calc(100vw - 32px));
+           height: min(640px, calc(100vh - 120px)); background: var(--card); border: 1px solid var(--line);
+           border-radius: 16px; box-shadow: 0 12px 40px rgba(0,0,0,.22); display: none; flex-direction: column;
+           overflow: hidden; }
+  .panel.open { display: flex; }
+  .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;
+                background: var(--accent); color: var(--accent-ink); font-weight: 600; }
+  .panel-head button { background: transparent; border: 0; color: inherit; font-size: 20px; cursor: pointer; }
+  .panel iframe { flex: 1; width: 100%; border: 0; }
+  .setup { padding: 20px; font-size: 14px; line-height: 1.5; color: var(--ink); }
+  .setup code { background: #f0ede6; padding: 1px 5px; border-radius: 4px; }
+  @media (max-width: 600px) { .hero h1 { font-size: 32px; } nav { display: none; } }
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo">NORTH<span>LINE</span> CYCLES</div>
+    <nav><a href="#">Bikes</a><a href="#">E-Bikes</a><a href="#">Gear</a><a href="#">Support</a></nav>
+  </header>
+
+  <section class="hero">
+    <h1>Ride further this season.</h1>
+    <p>Road, mountain and electric bikes shipped across Canada from Montréal. Questions about an order, a return or your warranty? Our assistant answers in seconds.</p>
+  </section>
+
+  <section class="grid">
+    <div class="card"><div class="tag">E-Bikes</div><h3>Voltway Commuter 500</h3><div class="price">$3,499</div></div>
+    <div class="card"><div class="tag">Road Bikes</div><h3>Aurora Sprint SL</h3><div class="price">$3,299</div></div>
+    <div class="card"><div class="tag">Helmets</div><h3>Summit Gear Road Helmet MIPS</h3><div class="price">$179</div></div>
+    <div class="card"><div class="tag">Apparel</div><h3>Tundra Winter Gloves</h3><div class="price">$49 · on sale</div></div>
+  </section>
+
+  <p class="help">Fictional store for the Databricks agents workshop. The chat is the Northline Customer Care Genie Agent: public through a Hugging Face Space, or internal through the Databricks embed.</p>
+
+  <button class="launcher" id="launcher">Chat with Northline</button>
+
+  <div class="panel" id="panel" role="dialog" aria-label="Northline customer care chat">
+    <div class="panel-head">
+      <span>Northline Customer Care</span>
+      <button id="close" aria-label="Close chat">×</button>
+    </div>
+    <div id="chat-body"></div>
+  </div>
+
+<script>
+  const panel = document.getElementById("panel");
+  const body = document.getElementById("chat-body");
+  let loaded = false;
+
+  // huggingface.co/spaces/<owner>/<name> is the Hub page around the app; an iframe
+  // needs the app itself at https://<owner>-<name>.hf.space. Convert it if needed.
+  function directSpaceUrl(url) {
+    const m = url.trim().match(/^https?:\/\/(?:www\.)?huggingface\.co\/spaces\/([^\/?#]+)\/([^\/?#]+)/i);
+    if (!m) return url.trim();
+    const sub = (m[1] + "-" + m[2]).toLowerCase().replace(/[._]/g, "-");
+    return "https://" + sub + ".hf.space";
+  }
+
+  function loadChat() {
+    if (loaded) return;
+    loaded = true;
+    if (!CHAT_URL) {
+      body.className = "setup";
+      body.innerHTML =
+        "<strong>Almost there.</strong><br><br>" +
+        "Paste a chat URL into <code>CHAT_URL</code> at the top of this file and reload:<br><br>" +
+        "• <strong>Public</strong>: your Hugging Face Space URL (<code>https://…hf.space</code>). Anyone can use it.<br>" +
+        "• <strong>Internal</strong>: the iframe <code>src</code> from <code>Share</code> → <code>Embed agent</code>. Visitors must be signed in to Databricks.";
+      return;
+    }
+    const frame = document.createElement("iframe");
+    frame.src = directSpaceUrl(CHAT_URL);
+    frame.title = "Northline Customer Care";
+    frame.setAttribute("allow", "clipboard-write");
+    body.style.flex = "1";
+    body.style.display = "flex";
+    body.appendChild(frame);
+  }
+
+  document.getElementById("launcher").addEventListener("click", () => {
+    panel.classList.toggle("open");
+    if (panel.classList.contains("open")) loadChat();
+  });
+  document.getElementById("close").addEventListener("click", () => panel.classList.remove("open"));
+</script>
+</body>
+</html>
