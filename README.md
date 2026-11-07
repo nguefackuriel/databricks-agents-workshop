@@ -11,10 +11,16 @@ In two hours, on a free Databricks account, you build:
 
 The shop, Northline Cycles, is made up. All data is synthetic.
 
+## Slides
+
+- [Slides (PDF)](slides/Build_a_Team_of_AI_Agents_with_Databricks_slides.pdf): open it right here on GitHub
+- [Slides (PowerPoint)](slides/Build_a_Team_of_AI_Agents_with_Databricks_slides.pptx): click **Download raw file**
+
 ## What is in this repo
 
 | File | What it is |
 | --- | --- |
+| `slides/` | The workshop slides, as PDF and PowerPoint |
 | `participant_guide.md` | The step-by-step guide for Labs 0 to 4, plus troubleshooting and bonus challenges |
 | `00_northline_setup.ipynb` | The setup notebook. Import it in Databricks and click **Run all** (Lab 0) |
 | `northline_website.html` | The fictional Northline web page with the chat bubble (Lab 4) |
